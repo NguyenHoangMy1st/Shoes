@@ -1,24 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import CartCard from '../CartCard';
 import './style.scss';
-import apiCart from '../API/apiCart';
 import { toast, ToastContainer } from 'react-toastify';
-import apiRemoveCartItems from '../API/apiRemoveCartItems';
-import apiUpdateCartItems from '../API/apiUPdateCartItems';
 import { useDispatch } from 'react-redux';
 import Button from '~/pages/Button';
+import apiCart from '~/api/user/apiCart';
+import apiUpdateCartItems from '~/api/user/apiUPdateCartItems';
+import apiRemoveCartItems from '~/api/user/apiRemoveCartItems';
 
 export default function CartList() {
     const dispatch = useDispatch();
     const [products, setProducts] = useState([]);
+    const navigate = useNavigate();
+    const checksessionStorage = () => {
+        if (!sessionStorage.getItem('token') || !sessionStorage.getItem('user') || !sessionStorage.getItem('jwt')) {
+            navigate('/login');
+
+            return false;
+        }
+        return true;
+    };
     // console.log(products);
     const fetchCarts = async () => {
+        if (!checksessionStorage()) {
+            return;
+        }
         try {
             const response = await apiCart.getAllCart();
             setProducts(response.data);
         } catch (error) {
-            // toast.error(error?.message);
+            console.log(error);
         }
     };
 
@@ -42,6 +54,7 @@ export default function CartList() {
             }
         } catch (error) {
             // toast.error(error.message);
+            console.log(error);
         }
     };
 

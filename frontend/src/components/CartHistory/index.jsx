@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import apiCart from '../API/apiCart';
 import './style.scss';
-import { useNavigate } from 'react-router-dom';
 import Button from '~/pages/Button';
-import apiBuyNow from '../API/apiBuyNow';
 import CartCardHistory from '../CartCardHistory';
+import apiBuyNow from '~/api/user/apiBuyNow';
+import apiCart from '~/api/user/apiCart';
 
 export default function CartHistory() {
     const [products, setProducts] = useState([]);
-    console.log(products);
     const handleBuyNow = async () => {
         try {
             const response = await apiBuyNow.postBuyNow();

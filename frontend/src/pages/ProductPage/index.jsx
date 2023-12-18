@@ -1,16 +1,15 @@
-import Header from '../../components/Layout/Header';
+import Header from '../../layouts/UserDefaultLayout/Header';
 import BrandList from '../../components/BrandList';
-import ProductGridList from '../../components/ProductGridList';
-import { useCart } from '../../contexts/CartContext';
+import { useCart } from '~/api/user/CartContext';
 import { useEffect, useState } from 'react';
-import apiProductGrid from '~/components/API/apiProductGrid';
+import apiProductGrid from '~/api/user/apiProductGrid';
+import ProductGridList from '~/components/ProductGridList';
 
 export default function ProductPage() {
     const { cartItems } = useCart();
     const [valueSearch, setValueSearch] = useState('');
     const [products, setProducts] = useState();
     const [productSearch, setProductSearch] = useState();
-    console.log(valueSearch);
     const fetchData = async () => {
         const response = await apiProductGrid.getAllProduct();
         setProducts(response?.data?.content);

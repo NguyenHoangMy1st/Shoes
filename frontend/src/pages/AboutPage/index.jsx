@@ -1,14 +1,13 @@
-import Header from '../../components/Layout/Header';
+import Header from '../../layouts/UserDefaultLayout/Header';
 import './style.scss';
 import { useEffect, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
-import apiProductDetail from '../../components/API/apiProductDetail';
-import apiAddItem from '../../components/API/apiAddItem';
-import CommentCard from '../../components/CommentCard';
-import CommentedShow from '../../components/CommentedShow';
-import { useCart } from '../../contexts/CartContext';
+import { useCart } from '~/api/user/CartContext';
 import Button from '../Button';
+import apiAddItem from '~/api/user/apiAddItem';
+import apiProductDetail from '~/api/admin/apiProductDetail';
+import CommentCard from '~/components/CommentCard';
 
 export default function AboutPage({ quantity = 1 }) {
     const navigate = useNavigate();
@@ -18,14 +17,21 @@ export default function AboutPage({ quantity = 1 }) {
     const { updateCartItems } = useCart();
     const [selectedSize, setSelectedSize] = useState('');
     const [selectedColor, setSelectedColor] = useState('');
-    const [selectedQuantity, setSelectedQuantity] = useState('');
     const [quantityDefault, setQuantityDefault] = useState(quantity);
     const [isLoading, setIsLoading] = useState(true); // Thêm isLoading vào đây
     const { id } = useParams();
+    const [selectedSizeQuantity, setSelectedSizeQuantity] = useState(null);
+    const [maxQuantity, setMaxQuantity] = useState(1);
+
+    const handleSizeClick = (size) => {
+        setSelectedSize(size.name);
+        setSelectedSizeQuantity(size.quantity);
+        setQuantityDefault(1);
+    };
 
     const handleAddToCart = async (productId) => {
         if (!selectedSize || !selectedColor) {
-            toast.error('Vui lòng chọn size và màu sắc trước khi thêm vào giỏ hàng');
+            toast.warning('Vui lòng chọn size và màu sắc trước khi thêm vào giỏ hàng');
             return;
         }
         const formData = {
@@ -60,8 +66,7 @@ export default function AboutPage({ quantity = 1 }) {
                 const response = await apiProductDetail.getProductDetail(id);
                 setProductDetail(response.data);
             } catch (error) {
-                // console.error('Error fetching product detail:', error);
-                // toast.error('Error fetching product detail');
+                toast.error('Sản phẩm không tồn tại', error);
             } finally {
                 setIsLoading(false); // Kết thúc loading, không phụ thuộc vào thành công hay thất bại
             }
@@ -76,7 +81,13 @@ export default function AboutPage({ quantity = 1 }) {
             navigate(`/pay?step=1`);
         }, 2000);
     };
-
+    useEffect(() => {
+        // Update maxQuantity based on the selectedSize
+        if (selectedSize) {
+            const selectedSizeInfo = productDetail.sizes.find((size) => size.name === selectedSize);
+            setMaxQuantity(selectedSizeInfo ? selectedSizeInfo.quantity : 1);
+        }
+    }, [selectedSize, productDetail.sizes]);
     const handleDecreaseQuantity = () => {
         if (quantityDefault > 1) {
             setQuantityDefault(quantityDefault - 1);
@@ -84,8 +95,15 @@ export default function AboutPage({ quantity = 1 }) {
     };
 
     const handleIncreaseQuantity = () => {
-        setQuantityDefault(quantityDefault + 1);
+        if (quantityDefault < maxQuantity) {
+            setQuantityDefault(quantityDefault + 1);
+        } else {
+            toast.warning(`Bạn không thể thêm nhiều hơn  ${maxQuantity} mục cho kích thước đã chọn.`);
+        }
     };
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     return (
         <>
@@ -123,7 +141,7 @@ export default function AboutPage({ quantity = 1 }) {
                                     <span className="about-table-price-old">${productDetail.price}</span>
                                     <span className="about-table-price-current">${productDetail.discountedPrice}</span>
                                 </div>
-                                <div className="about-table-size">
+                                {/* <div className="about-table-size">
                                     <span className="about-size-name">Size:</span>
                                     <select
                                         className="about-size-font"
@@ -137,7 +155,29 @@ export default function AboutPage({ quantity = 1 }) {
                                         <option value="M">M</option>
                                         <option value="L">L</option>
                                     </select>
+                                </div> */}
+                                <div className="about-table-size">
+                                    <span className="about-size-name">Size:</span>
+                                    <div className="about-size-buttons">
+                                        {productDetail.sizes.map((size) => (
+                                            <button
+                                                key={size.name}
+                                                className={`size-button ${
+                                                    selectedSize === size.name ? 'selected' : ''
+                                                }`}
+                                                onClick={() => handleSizeClick(size)}
+                                            >
+                                                {size.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    {selectedSizeQuantity !== null && (
+                                        <span className="selected-size-quantity">
+                                            ({selectedSizeQuantity} available)
+                                        </span>
+                                    )}
                                 </div>
+
                                 <div className="about-table-color">
                                     <span className="about-color-name">Color:</span>
                                     <select
@@ -188,7 +228,6 @@ export default function AboutPage({ quantity = 1 }) {
                 )}
             </div>
             <CommentCard productId={id} />
-            <CommentedShow />
         </>
     );
 }

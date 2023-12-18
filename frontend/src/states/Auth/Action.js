@@ -12,7 +12,7 @@ import {
 } from './ActionType';
 import api_instance from '~/utils/axiosCustomize';
 
-// const token = localStorage.getItem('jwt');
+// const token = sessionStorage.getItem('jwt');
 
 const registerRequest = () => ({ type: REGISTER_REQUEST });
 const registerSuccess = (user) => ({ type: REGISTER_SUCCESS, payload: user });
@@ -26,7 +26,7 @@ export const register = (reqData) => async (dispatch) => {
         const user = response.data;
 
         if (user.jwt) {
-            localStorage.setItem('jwt', user.jwt);
+            sessionStorage.setItem('jwt', user.jwt);
         }
         dispatch(registerSuccess(user.jwt));
     } catch (error) {
@@ -45,10 +45,9 @@ export const login = (reqData) => async (dispatch) => {
     try {
         const res = await api_instance.post(`/auth/signin`, reqData);
         const user = res.data;
-        // console.log(' ============', user);
         if (user.jwt) {
-            localStorage.setItem('jwt', user.jwt);
-            localStorage.setItem('token', user.jwt);
+            sessionStorage.setItem('jwt', user.jwt);
+            sessionStorage.setItem('token', user.jwt);
         }
         dispatch(loginSuccess(user));
     } catch (error) {
@@ -70,7 +69,7 @@ export const getUser = (jwt) => async (dispatch) => {
             },
         });
         const user = response.data;
-        localStorage.setItem('user', JSON.stringify(user));
+        sessionStorage.setItem('user', JSON.stringify(user));
 
         dispatch(getUserSuccess(user)); // Pass the user to getUserSuccess
     } catch (error) {

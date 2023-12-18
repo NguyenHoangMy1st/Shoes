@@ -4,10 +4,9 @@ import { useState } from 'react';
 import AddressCard from '../AddressCard';
 import { toast } from 'react-toastify';
 import { ToastContainer } from 'react-toastify';
-import apiCreateOrder from '../API/apiCreateOrder.js';
 import { useNavigate } from 'react-router-dom';
-import AddressList from '../AddressList';
 import Button from '~/pages/Button';
+import apiCreateOrder from '~/api/user/apiCreateOrder';
 
 export default function DeliveryAddressForm() {
     const [Firstname, setFirstname] = useState('');
@@ -38,9 +37,9 @@ export default function DeliveryAddressForm() {
             console.log('response:', response);
             if (response) {
                 toast.success('Thêm thông tin thành công ');
-                // setTimeout(() => {
-                //     navigate('/pay?step=2');
-                // }, 2000);
+                setTimeout(() => {
+                    navigate('/pay?step=2');
+                }, 2000);
             } else {
                 toast.error('Có lỗi khi thêm thông tin');
             }
@@ -55,7 +54,7 @@ export default function DeliveryAddressForm() {
             <Grid container spacing={4} className="delivery-main">
                 <Grid xs={12} lg={5} className="delivery">
                     <div className="delivery-btn">
-                        <AddressList />
+                        <AddressCard />
                     </div>
                 </Grid>
                 <Grid xs={12} lg={7}>
@@ -72,6 +71,7 @@ export default function DeliveryAddressForm() {
                                         autoComplete="given-name"
                                         value={Firstname}
                                         onChange={(event) => setFirstname(event.target.value)}
+                                        style={{ fontSize: '18px' }}
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>

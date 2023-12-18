@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import BrandCard from '../BrandCard';
-import logo from '../../images/logoNike.png';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { Pagination, Navigation, Mousewheel, Keyboard } from 'swiper/modules';
 import './style.scss';
-import apiProductGrid from '../API/apiProductGrid';
+import apiProductGrid from '~/api/user/apiProductGrid';
 
 const breakpointsSwiper = {
     320: {
@@ -31,21 +30,23 @@ const breakpointsSwiper = {
 export default function BrandList() {
     const [brands, setBrands] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [pageNumber] = useState('0');
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await apiProductGrid.getAllProduct();
-                const uniqueBrands = filterUniqueBrands(response.data);
+                const response = await apiProductGrid.getAllProduct(pageNumber);
+                const uniqueBrands = filterUniqueBrands(response?.data?.content);
 
                 setBrands(uniqueBrands);
                 setIsLoading(false);
             } catch (error) {
                 setIsLoading(false);
+                console.log(error);
             }
         };
 
         fetchData();
-    }, []);
+    }, [pageNumber]);
 
     const filterUniqueBrands = (brands) => {
         const uniqueBrandNames = new Set();
