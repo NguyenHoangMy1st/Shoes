@@ -23,11 +23,10 @@
         gap: 0 30px;
     }
     &-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         padding: 50px;
-    }
-    &-info .profile-img {
-        width: 300px;
-        border-radius: 50%;
     }
     &-info .profile-accout {
         text-align: center;
@@ -53,6 +52,19 @@
         cursor: pointer;
         font-weight: 600;
     }
+    &-detail .profile-btn .profile-btn-personal.active {
+        background: linear-gradient(to left, #008eff, #f60000);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: bold;
+    }
+    &-detail .profile-btn .profile-btn-personal:hover,
+    &-detail .profile-btn .profile-btn-changepassword:hover,
+    &-detail .profile-btn .profile-btn-logout:hover {
+        background: linear-gradient(to left, #008eff, #f60000);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
     &-detail .profile-btn .profile-btn-changepassword {
         color: black;
         border: none;
@@ -62,6 +74,12 @@
         font-size: 18px;
         cursor: pointer;
         font-weight: 600;
+    }
+    &-detail .profile-btn .profile-btn-changepassword.active {
+        background: linear-gradient(to left, #008eff, #f60000);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: bold;
     }
     &-detail .profile-btn .profile-btn-logout {
         color: black;
@@ -80,7 +98,7 @@
     }
     &-detail .profile-show-personal .profile-name {
         display: flex;
-        gap: 0 50px;
+        gap: 0 66px;
         align-items: center;
     }
     &-detail .profile-show-personal .profile-age {
@@ -90,17 +108,17 @@
     }
     &-detail .profile-show-personal .profile-address {
         display: flex;
-        gap: 0 70px;
+        gap: 0 86px;
         align-items: center;
     }
     &-detail .profile-show-personal .profile-email {
         display: flex;
-        gap: 0 80px;
+        gap: 0 108px;
         align-items: center;
     }
     &-detail .profile-show-personal .profile-phone {
         display: flex;
-        gap: 0 29px;
+        gap: 0 34px;
         align-items: center;
     }
     &-detail .profile-show-personal .profile-date {
@@ -147,7 +165,7 @@
     }
     &-detail .profile-show-changepassword .profile-username {
         display: flex;
-        gap: 0 66px;
+        gap: 0 67px;
         align-items: center;
     }
     &-detail .profile-show-changepassword .profile-password {
@@ -157,7 +175,7 @@
     }
     &-detail .profile-show-changepassword .profile-passwordconfim {
         display: flex;
-        gap: 0 35px;
+        gap: 0 33px;
         align-items: center;
     }
     &-btn-update {
@@ -195,4 +213,7 @@
         width: auto;
         margin: 0 auto;
     }
+}
+.bbb {
+    width: 70%;
 }

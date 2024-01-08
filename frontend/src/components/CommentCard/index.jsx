@@ -12,11 +12,10 @@ import apiProductDetail from '~/api/admin/apiProductDetail';
 import apiCreateReview from '~/api/user/apiReview';
 import apiReviewDetail from '~/api/user/apiReviewDetail';
 import Raiting from '~/api/user/Raiting';
+import { VscAccount } from 'react-icons/vsc';
+import { format } from 'date-fns';
 
 export default function CommentCard({ productId }) {
-    const image =
-        'https://png.pngtree.com/element_our/20200611/ourlarge/pngtree-doggie-cute-cheap-expression-pack-avatar-image_2251655.jpg';
-
     const [product, setProduct] = useState();
     const [value, setValue] = useState(0);
     const [reviewText, setReviewText] = useState('');
@@ -41,9 +40,8 @@ export default function CommentCard({ productId }) {
 
     const postCreateRaiting = async () => {
         if (!reviewText.trim()) {
-            // If reviewText is empty or only contains whitespace
-            toast.warning('Vui lòng nhập đánh giá của bạn trước khi gửi.');
-            return; // Stop the function execution
+            toast.warning('Please enter your rating before submitting.');
+            return;
         }
         const formData = {
             productId: productId,
@@ -56,14 +54,13 @@ export default function CommentCard({ productId }) {
             console.log('response:', response);
 
             if (response) {
-                toast.success('Thêm đánh giá thành công');
-                setTimeout(() => {}, 2000);
+                toast.success('Added review successfully');
                 fetchReviewDetail();
             } else {
-                toast.error('Có lỗi khi thêm đánh giá');
+                toast.error('There was an error adding a review');
             }
         } catch (error) {
-            toast.error('Bạn cần đăng nhập', error);
+            toast.error('You need to log in', error);
         }
     };
 
@@ -252,7 +249,14 @@ export default function CommentCard({ productId }) {
                                     <div className="card-top">
                                         <div className="comment-profile">
                                             <div className="comment-profile-image">
-                                                <img src={image} alt="123" width={100} height={100} />
+                                                <VscAccount
+                                                    style={{
+                                                        sizeMode: 'contain',
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        fontWeight: '300',
+                                                    }}
+                                                />
                                             </div>
                                             <div className="comment-profile-name">
                                                 <strong>
@@ -268,7 +272,7 @@ export default function CommentCard({ productId }) {
                                                 </div>
                                             </div>
                                             <div className="comment-date">
-                                                <span>{new Date(review.createAt).toLocaleString()}</span>
+                                                <span>{format(new Date(review.createAt), 'dd/MM/yyyy')}</span>
                                             </div>
                                         </div>
                                     </div>

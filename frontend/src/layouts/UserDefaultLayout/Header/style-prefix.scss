@@ -145,34 +145,16 @@
 
 /* style.scss */
 
-.hello-auth {
-    font-family: 'Poppins', sans-serif;
-    color: #333;
-    text-decoration: none;
-    font-size: 18px;
-    font-weight: bold;
-    padding: 8px 16px;
-    border-radius: 4px;
-    display: inline-block;
-    white-space: nowrap; /* Ngăn chữ xuống dòng */
-    overflow: hidden; /* Ẩn nội dung vượt ra khỏi khung chứa */
-    animation: marquee 8s linear infinite; /* Tốc độ chạy và lặp vô hạn */
-    transition: background-color 0.3s ease;
-    background: linear-gradient(to left, #008eff, #f60000);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
 .hello-auth:hover {
     background-color: #ddd;
 }
 
 @keyframes marquee {
     0% {
-        transform: translateX(70%);
+        transform: translateX(220%);
     }
     100% {
-        transform: translateX(-70%);
+        transform: translateX(40%);
     }
 }
 
@@ -331,7 +313,6 @@
     align-items: center;
     border-bottom: 2px solid var(--cultured);
 }
-
 .menu-top .menu-title {
     color: var(--salmon-pink);
     font-size: var(--fs-4);
@@ -760,6 +741,12 @@
     }
 
     .header-user-actions .action-btn:hover {
+        color: var(--salmon-pink);
+    }
+    .header-user-actions .action-btn-history-order {
+        color: var(--onyx);
+    }
+    .header-user-actions .action-btn-history-order:hover {
         color: var(--salmon-pink);
     }
 

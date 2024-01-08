@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import Button from '~/pages/Button';
@@ -6,13 +6,15 @@ import apiProfile from '~/api/user/apiProfile';
 import './style.scss';
 import apiUpdateProfile from '~/api/user/apiUpdateProfile';
 import apiChangePass from '~/api/user/apiChangePass';
-
+import { VscAccount } from 'react-icons/vsc';
+import { CheckRoleContext } from '~/context/CheckRoleProvider';
 export default function ProfileCard() {
+    const { setRole } = useContext(CheckRoleContext);
     const [profiles, setProfiles] = useState([]);
     const [defaultAddress, setDefaultAddress] = useState(null);
 
     const checksessionStorage = () => {
-        if (!sessionStorage.getItem('token') || !sessionStorage.getItem('user') || !sessionStorage.getItem('jwt')) {
+        if (!sessionStorage.getItem('jwt')) {
             navigate('/login');
             return false;
         }
@@ -31,14 +33,12 @@ export default function ProfileCard() {
                 setDefaultAddress(response.data.addresses[0]);
             }
         } catch (error) {
-            toast.error('Có lỗi xảy ra khi lấy thông tin cá nhân');
+            toast.error(' An error occurred while retrieving personal information');
         }
     };
     useEffect(() => {
         fetchProfile();
     }, []);
-
-    const image = 'https://i.pinimg.com/736x/eb/1b/cc/eb1bcce796b5706ec0803a9e985eb45d.jpg';
 
     // personal
     const [isEditing, setIsEditing] = useState(false);
@@ -54,6 +54,9 @@ export default function ProfileCard() {
     // show 1 trong 2
     const [showPersonal, setShowPersonal] = useState(true);
     const [showChangePassword, setShowChangePassword] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const navigate = useNavigate();
 
     const handleShowPersonal = () => {
@@ -65,13 +68,12 @@ export default function ProfileCard() {
         setShowChangePassword(true);
     };
     const handleLogout = () => {
-        toast.success('Đăng xuất thành công');
-        sessionStorage.removeItem('token');
-        sessionStorage.removeItem('user');
-        sessionStorage.removeItem('jwt');
+        toast.success('Signed out successfully');
+        sessionStorage.clear();
+        setRole(null);
         setTimeout(() => {
             navigate('/login');
-        }, 2000);
+        }, 500);
     };
 
     const handleEdit = () => {
@@ -89,15 +91,14 @@ export default function ProfileCard() {
                 };
                 const response = await apiChangePass.postChangepass(formdata);
                 if (response.status === 200) {
-                    toast.success('Thay đổi mật khẩu thành công');
-                } else {
-                    toast.error('Đã có lỗi xảy ra khi thay đổi mật khẩu');
+                    toast.success('Password changed successfully');
+                    handleCancel();
                 }
             } catch (error) {
-                toast.error('Error changing password:', error);
+                toast.error('An error occurred while changing the password', error);
             }
         } else {
-            toast.error('Mật khẩu không khớp');
+            toast.warning('password incorrect');
         }
     };
     const handleUpdateProfile = async () => {
@@ -110,13 +111,14 @@ export default function ProfileCard() {
             console.log(formdata);
             const response = await apiUpdateProfile.putUpdateprofile(formdata);
             if (response.status === 200) {
-                toast.success('Cập nhật thông tin cá nhân thành công');
+                fetchProfile();
+                toast.success('Successfully updated personal information');
                 setIsEditing(false);
             } else {
-                toast.error('Đã có lỗi xảy ra khi cập nhật thông tin cá nhân');
+                toast.error('An error occurred while updating personal information');
             }
         } catch (error) {
-            toast.error('Đã có lỗi xảy ra khi cập nhật thông tin cá nhân');
+            toast.error('An error occurred while updating personal information');
         }
     };
     const handleCancel = () => {
@@ -131,17 +133,23 @@ export default function ProfileCard() {
                 <h1 className="profile-title">Profile information</h1>
                 <div className="profile-content">
                     <div className="profile-info">
-                        <img src={image} alt="" className="profile-img"></img>
+                        <VscAccount style={{ width: 250, height: 250, fontWeight: '300' }} />
                         <div className="profile-accout">
                             <span>{`${profiles.lastName} ${profiles.firstName}`}</span>
                         </div>
                     </div>
                     <div className="profile-detail">
                         <div className="profile-btn">
-                            <button className="profile-btn-personal" onClick={handleShowPersonal}>
+                            <button
+                                className={`profile-btn-personal ${showPersonal ? 'active' : ''}`}
+                                onClick={handleShowPersonal}
+                            >
                                 Personal Information
                             </button>
-                            <button className="profile-btn-changepassword" onClick={handleShowChangePassword}>
+                            <button
+                                className={`profile-btn-changepassword ${showChangePassword ? 'active' : ''}`}
+                                onClick={handleShowChangePassword}
+                            >
                                 Change Password
                             </button>
                             <button className="profile-btn-logout" onClick={handleLogout}>
@@ -168,7 +176,7 @@ export default function ProfileCard() {
                                 ></input>
                             </div>
                             <div className="profile-address">
-                                <label className="profile-show-label">Địa chỉ</label>
+                                <label className="profile-show-label">Address</label>
                                 {defaultAddress ? (
                                     <input
                                         type="text"
@@ -192,7 +200,7 @@ export default function ProfileCard() {
                                 />
                             </div>
                             <div className="profile-phone">
-                                <label className="profile-show-label">Số điện thoại</label>
+                                <label className="profile-show-label">Phone Number</label>
                                 {}
                                 <input
                                     type="text"
@@ -202,22 +210,6 @@ export default function ProfileCard() {
                                     readOnly={!isEditing}
                                 />
                             </div>
-                            {/* <div className="profile-sex">
-                                <label className="profile-show-label">Giới tính</label>
-                                <input
-                                    type="radio"
-                                    defaultValue={profiles.gender}
-                                    checked={profiles.gender === 'male'}
-                                />
-                                <label>Nam</label>
-
-                                <input
-                                    type="radio"
-                                    defaultValue={profiles.gender}
-                                    checked={profiles.gender === 'female'}
-                                />
-                                <label>Nữ</label>
-                            </div> */}
 
                             <div className="profile-btn-update">
                                 {isEditing ? (
@@ -230,30 +222,69 @@ export default function ProfileCard() {
                         <div className={showChangePassword ? 'profile-show-changepassword' : 'hidden'}>
                             <div className="profile-username">
                                 <label className="profile-show-label">Oldpassword</label>
-                                <input
-                                    type="password"
-                                    className="profile-show-input"
-                                    value={oldpassword}
-                                    onChange={(event) => setOldpassword(event.target.value)}
-                                ></input>
+                                <div className="bbb">
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        className="profile-show-input"
+                                        value={oldpassword}
+                                        onChange={(event) => setOldpassword(event.target.value)}
+                                    ></input>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        style={{ background: 'transparent', position: 'relative', right: 25 }}
+                                        className="toggle-password-button"
+                                    >
+                                        <i
+                                            className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
+                                            aria-hidden="true"
+                                        ></i>
+                                    </button>
+                                </div>
                             </div>
                             <div className="profile-password">
                                 <label className="profile-show-label">New Password</label>
-                                <input
-                                    type="password"
-                                    className="profile-show-input"
-                                    value={newpassword}
-                                    onChange={(event) => setNewpassword(event.target.value)}
-                                ></input>
+                                <div className="bbb">
+                                    <input
+                                        type={showNewPassword ? 'text' : 'password'}
+                                        className="profile-show-input"
+                                        value={newpassword}
+                                        onChange={(event) => setNewpassword(event.target.value)}
+                                    ></input>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                        style={{ background: 'transparent', position: 'relative', right: 25 }}
+                                        className="toggle-password-button"
+                                    >
+                                        <i
+                                            className={`fa ${showNewPassword ? 'fa-eye-slash' : 'fa-eye'}`}
+                                            aria-hidden="true"
+                                        ></i>
+                                    </button>
+                                </div>
                             </div>
                             <div className="profile-passwordconfim">
                                 <label className="profile-show-label">Confim Password</label>
-                                <input
-                                    type="password"
-                                    className="profile-show-input"
-                                    value={passwordconfim}
-                                    onChange={(event) => setPasswordconfim(event.target.value)}
-                                ></input>
+                                <div className="bbb">
+                                    <input
+                                        type={showConfirmPassword ? 'text' : 'password'}
+                                        className="profile-show-input"
+                                        value={passwordconfim}
+                                        onChange={(event) => setPasswordconfim(event.target.value)}
+                                    ></input>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        style={{ background: 'transparent', position: 'relative', right: 25 }}
+                                        className="toggle-password-button"
+                                    >
+                                        <i
+                                            className={`fa ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}
+                                            aria-hidden="true"
+                                        ></i>
+                                    </button>
+                                </div>
                             </div>
                             <div className="profile-btn-change">
                                 <Button

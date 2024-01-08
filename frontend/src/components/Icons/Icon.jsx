@@ -5,13 +5,16 @@ import {
     AddProductIcon,
     ArrowIcon,
     BasketIcon,
+    Calendar,
     CogIcon,
     CustomersIcon,
     DashboardIcon,
     DowntrendIcon,
     EyeIcon,
     GridIcon,
+    HistoryOrder,
     ListIcon,
+    Loading,
     OptionsIcon,
     OrdersIcon,
     ProductsIcon,
@@ -26,6 +29,9 @@ import {
 
 const Icon = (props) => {
     const components = {
+        history_order: HistoryOrder,
+        loading: Loading,
+        calendar: Calendar,
         cell_phone_link: SellPhoneLink,
         products: ProductsIcon,
         orders: OrdersIcon,
@@ -49,7 +55,7 @@ const Icon = (props) => {
     };
 
     const IconComponent = components[props.icon];
-    return <IconComponent {...props} />;
+    return <IconComponent ref={props.ref} {...props} />;
 };
 
 export default Icon;
@@ -60,6 +66,7 @@ Icon.propTypes = {
         color: PropTypes.string,
         width: PropTypes.number,
         classes: PropTypes.string,
+        iconRef: PropTypes.object,
     }),
 };
 
